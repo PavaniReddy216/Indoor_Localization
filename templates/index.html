@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indoor Localization</title>
+    <style>
+        /* General Page Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('/static/images/1.webp'); /* Fixed typo in image extension */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header */
+        header {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        header p {
+            margin: 5px 0;
+        }
+
+        /* Header Links */
+        .header-links {
+            margin-top: 10px;
+        }
+
+        .header-links a {
+            color: #ffcc00;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+
+        .header-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Container */
+        .container {
+    max-width: 400px;
+    margin: 20px auto;
+    background: #1e1e1e; /* Dark gray for a modern appearance */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    color: white; /* Ensure text is readable */
+}
+
+
+        /* Label & Input */
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Button */
+        button {
+            background-color: darkslategray;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 5px;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: darkslategray;
+        }
+
+        /* Prediction Result */
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            padding: 10px;
+            background: black;
+            display: inline-block;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #ffcc00;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+
+    <script>
+        async function predictLocation() {
+            const rssiValues = [
+                parseFloat(document.getElementById("rssi1").value),
+                parseFloat(document.getElementById("rssi2").value),
+                parseFloat(document.getElementById("rssi3").value),
+                parseFloat(document.getElementById("rssi4").value),
+                parseFloat(document.getElementById("rssi5").value)
+            ];
+
+            const response = await fetch("/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ rssi_values: rssiValues })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                document.getElementById("result").innerHTML = `
+                    <p><strong>Building:</strong> ${result.Building}</p>
+                    <p><strong>Floor:</strong> ${result.Floor}</p>
+                    <p><strong>Room:</strong> ${result.Room}</p>
+                `;
+            } else {
+                document.getElementById("result").innerHTML = `<p class="error">Error: ${result.error}</p>`;
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <h1>Indoor Localization using RSSI</h1>
+        <p>Project using Li-Fi and Machine Learning</p>
+
+        <!-- Links to PPT, Project Description, and EDA Tool -->
+        <div class="header-links">
+            <a href="https://docs.google.com/presentation/d/1r1f0UBUNWYvcc5C03ryBeKnLKZ68yT9A/edit?usp=drive_link&ouid=110642633460267312664&rtpof=true&sd=true" target="_blank">📂 Project PPT</a>
+            <a href="{{ url_for('description') }}" target="_blank">📄 Project Description</a>
+
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <h2>Indoor Localization Prediction</h2>
+        
+        <div class="input-group">
+            <label>RSSI Value 1:</label>
+            <input type="number" id="rssi1">
+        </div>
+        <div class="input-group">
+            <label>RSSI Value 2:</label>
+            <input type="number" id="rssi2">
+        </div>
+        <div class="input-group">
+            <label>RSSI Value 3:</label>
+            <input type="number" id="rssi3">
+        </div>
+        <div class="input-group">
+            <label>RSSI Value 4:</label>
+            <input type="number" id="rssi4">
+        </div>
+        <div class="input-group">
+            <label>RSSI Value 5:</label>
+            <input type="number" id="rssi5">
+        </div>
+
+        <button onclick="predictLocation()">Predict</button>
+
+        <h3>Prediction Result:</h3>
+        <div id="result"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>Developed by Batch C6 | 2025 </p>
+    </footer>
+
+</body>
+</html>
